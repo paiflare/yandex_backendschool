@@ -1,0 +1,27 @@
+version: '3.0'
+services:
+
+  app:
+    build:
+      context: .
+    restart: always
+    networks:
+      - price_comparison
+    ports:
+      - 80:80
+    env_file: .env
+    command: >
+      bash -c "make migrate
+      && python -m price_comparison"
+
+
+  db:
+    image: postgres
+    restart: always
+    networks:
+      - price_comparison
+    env_file: .env
+
+networks:
+  price_comparison:
+    driver: bridge
