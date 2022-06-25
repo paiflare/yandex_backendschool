@@ -19,6 +19,10 @@ class ShopUnitType(Schema):
     enum = EnumField(ShopUnitTypeEnum)
 
 
+class Date(Schema):
+    date = DateTime(format=DATETIME_FORMAT, strict=True, required=True)
+
+
 class PatchShopUnit(Schema):
     id = UUID(strict=True, required=True)
     name = Str(validate=Length(min=1, max=256), allow_none=False, strict=True, required=True)
@@ -44,12 +48,7 @@ class ShopUnitImport(PatchShopUnit):
 
 
 class ShopUnitImportRequest(Schema):
-    items = Nested(
-        ShopUnitImport,
-        many=True,
-        required=True,
-        validate=Length(max=10000),
-    )
+    items = Nested(ShopUnitImport, many=True, required=True, validate=Length(max=10000))
     updateDate = DateTime(format=DATETIME_FORMAT, strict=True, required=True)
 
     @validates('updateDate')
@@ -64,6 +63,14 @@ class ShopUnitImportRequest(Schema):
             if shop_unit['id'] in shop_unit_ids:
                 raise ValidationError('id %r is not unique' % shop_unit['id'])
             shop_unit_ids.add(shop_unit['id'])
+
+
+class ShopUnitStatisticUnit(ShopUnitImport):
+    date = DateTime(format=DATETIME_FORMAT, strict=True, required=True)
+
+
+class ShopUnitStatisticResponse(Schema):
+    items = Nested(ShopUnitStatisticUnit, many=True, required=True, validate=Length(max=10000))
 
 
 class Error(Schema):
